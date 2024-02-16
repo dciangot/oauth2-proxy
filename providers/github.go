@@ -10,12 +10,14 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
+
+	"golang.org/x/exp/maps"
 
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/options"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/sessions"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/logger"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/requests"
-	"golang.org/x/exp/maps"
 )
 
 // GitHubProvider represents an GitHub based Identity Provider
@@ -511,4 +513,18 @@ func (p *GitHubProvider) getTeams(ctx context.Context, s *sessions.SessionState)
 	}
 
 	return nil
+}
+
+func (p *GitHubProvider) CreateSessionFromToken(ctx context.Context, token string) (*sessions.SessionState, error) {
+
+	createdAt := time.Now()
+	expiresAt := time.Now().Add(time.Hour)
+
+	_ = ctx
+
+	return &sessions.SessionState{
+		CreatedAt:   &createdAt,
+		ExpiresOn:   &expiresAt,
+		AccessToken: token,
+	}, nil
 }

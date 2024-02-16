@@ -7,10 +7,11 @@ import (
 	"regexp"
 
 	"github.com/justinas/alice"
+	k8serrors "k8s.io/apimachinery/pkg/util/errors"
+
 	middlewareapi "github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/middleware"
 	sessionsapi "github.com/oauth2-proxy/oauth2-proxy/v7/pkg/apis/sessions"
 	"github.com/oauth2-proxy/oauth2-proxy/v7/pkg/logger"
-	k8serrors "k8s.io/apimachinery/pkg/util/errors"
 )
 
 const jwtRegexFormat = `^ey[IJ][a-zA-Z0-9_-]*\.ey[IJ][a-zA-Z0-9_-]*\.[a-zA-Z0-9_-]+$`
@@ -66,6 +67,7 @@ func (j *jwtSessionLoader) getJwtSession(req *http.Request) (*sessionsapi.Sessio
 		return nil, nil
 	}
 
+	fmt.Println(auth)
 	token, err := j.findTokenFromHeader(auth)
 	if err != nil {
 		return nil, err
@@ -92,7 +94,8 @@ func (j *jwtSessionLoader) findTokenFromHeader(header string) (string, error) {
 		return "", err
 	}
 
-	if tokenType == "Bearer" && j.jwtRegex.MatchString(token) {
+	fmt.Println(j.jwtRegex.MatchString(token))
+	if tokenType == "Bearer" {
 		// Found a JWT as a bearer token
 		return token, nil
 	}
